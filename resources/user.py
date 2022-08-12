@@ -21,6 +21,19 @@ _user_parser.add_argument('password',
                           required=True,
                           help="This field cannot be blank."
                           )
+_user_parser.add_argument('email',
+                          type=str,
+                          required=True,
+                          help="Email field cannot be blank."
+                          )
+_user_parser.add_argument('firstName',
+                          type=str,
+                          required=False,
+                          )
+_user_parser.add_argument('lastName',
+                          type=str,
+                          required=False,
+                          )
 
 
 class UserRegister(Resource):
@@ -29,8 +42,11 @@ class UserRegister(Resource):
 
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with that username already exists"}, 400
+        
+        if UserModel.find_by_email(data['email']):
+            return {"message": "A user with that email already exists"}, 409
 
-        user = UserModel(data['username'], data['password'])
+        user = UserModel(data['username'], data['email'], data['password'], data['firstName'], data['lastName'])
         user.save_to_db()
 
         return {"message": "User created successfully."}, 201

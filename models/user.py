@@ -12,6 +12,14 @@ class UserModel(db.Model):
     lastName = db.Column(db.String(80), nullable=True)
     image = db.Column(db.String(80), nullable=True)
 
+    def __init__(self, username, email, password, firstName, lastName):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.firstName = firstName
+        self.lastName = lastName
+        
+
     def json(self):
         return {
             'id': self.id,
@@ -21,6 +29,10 @@ class UserModel(db.Model):
     @classmethod
     def find_by_username(cls, username: str) -> "UserModel":
         return cls.query.filter_by(username=username).first()
+
+    @classmethod
+    def find_by_email(cls, email: str) -> "UserModel":
+        return cls.query.filter_by(email=email).first()
 
     @classmethod
     def find_all_users(cls):
