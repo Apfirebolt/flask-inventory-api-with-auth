@@ -6,16 +6,13 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from resources.user import UserRegister, UserLogin, User, TokenRefresh
 
-from config.db import db
+from db import db
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:pass12345@localhost:5432/flask-inventory'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
-db = SQLAlchemy(app)
-
-# from models.user import UserModel
 
 migrate = Migrate(app, db)
 api = Api(app)
@@ -23,39 +20,6 @@ api = Api(app)
 # 1 - flask db init
 # 2 - flask db migrate
 # 3 - flask db upgrade
-
-class UserModel(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80))
-    password = db.Column(db.String(80))
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def json(self):
-        return {
-            'id': self.id,
-            'username': self.username
-        }
-    
-    @classmethod
-    def find_by_username(cls, username):
-        return cls.query.filter_by(username=username).first()
-
-    @classmethod
-    def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).first()
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def delete_from_db(self):
-        db.session.delete(self)
-        db.session.commit()
 
 @app.route("/")
 def home():
@@ -131,6 +95,9 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(TokenRefresh, '/refresh')
 
+from models.user import UserModel
+
+db.init_app(app)
+
 if __name__ == '__main__':
-    db.init_app(app)
     app.run(port=5000, debug=True)
