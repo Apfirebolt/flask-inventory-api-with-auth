@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 from models.item import ItemModel
+from models.image import ItemImageModel
 
 
 class Item(Resource):
@@ -109,5 +110,5 @@ class UploadItemImage(Resource):
             },
             200,
         )
-        
+
 
