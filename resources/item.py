@@ -102,7 +102,7 @@ class UploadItemImage(Resource):
         parse.add_argument('file', type=FileStorage, location='files')
         args = parse.parse_args()
         image_file = args['file']
-        image_file.save("your_file_name.jpg")
+        image_file.save("media/" + "your_file_name.jpg")
         return (
             {
                 "message": "Image uploaded successfully.",

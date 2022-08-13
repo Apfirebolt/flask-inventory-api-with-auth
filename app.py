@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager
 from resources.user import UserRegister, UserLogin, User, TokenRefresh
 from resources.item import Item, ItemList, UploadItemImage
 from resources.store import Store, StoreList
+import os
 
 from db import db
 
@@ -34,6 +35,7 @@ JWT related configuration. The following functions includes:
 2) customize the token expired error message 
 """
 app.config['JWT_SECRET_KEY'] = 'jose'  # we can also use app.secret like before, Flask-JWT-Extended can recognize both
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'media')
 app.config['JWT_BLACKLIST_ENABLED'] = True  # enable blacklist feature
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']  # allow blacklisting for access and refresh tokens
 jwt = JWTManager(app)
@@ -101,6 +103,14 @@ api.add_resource(UserRegister, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(TokenRefresh, '/refresh')
+
+# Media files
+@app.route('/media/<path:filename>')
+def media(filename):
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        filename,
+    )
 
 from models.user import UserModel
 from models.store import StoreModel
