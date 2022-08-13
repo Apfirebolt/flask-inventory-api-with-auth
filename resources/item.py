@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from werkzeug.datastructures import FileStorage
 from flask_jwt_extended import (
     jwt_required,
     get_jwt,
@@ -92,3 +93,21 @@ class ItemList(Resource):
             },
             200,
         )
+
+
+class UploadItemImage(Resource):
+
+    def post(self):
+        parse = reqparse.RequestParser()
+        parse.add_argument('file', type=FileStorage, location='files')
+        args = parse.parse_args()
+        image_file = args['file']
+        image_file.save("your_file_name.jpg")
+        return (
+            {
+                "message": "Image uploaded successfully.",
+            },
+            200,
+        )
+        
+
